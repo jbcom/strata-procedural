@@ -129,7 +129,7 @@
     "publint": "^0.3.17",
     "react": "^19.3.0",
     "react-test-renderer": "^19.3.0",
-    "three": "^0.186.1",
+    "three": "^0.187.0",
     "tsup": "^9.0.0",
     "typescript": "6.0.3",
     "vitest": "^4.1.11"
