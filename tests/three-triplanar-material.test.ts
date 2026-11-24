@@ -1,4 +1,4 @@
-import { expect, it } from "vitest";
+import { expect, it, vi } from "vitest";
 import {
   type BackSide,
   type Color,
@@ -433,4 +433,50 @@ it("rejects the legacy r152 sRGB numeric format when the installed peer does not
   input.map.format = 1035;
   expect(() => factory()(input)).toThrow();
   input.dispose();
+});
+
+it("accepts the legacy r152 sRGB format only when the installed peer exports it", async () => {
+  vi.resetModules();
+  vi.doMock("three", async (importOriginal) => ({
+    ...(await importOriginal<typeof ThreePeer>()),
+    _SRGBAFormat: 1035,
+  }));
+  try {
+    const legacy = (await import("../src/three.ts")) as typeof adapters;
+    const legacyTextures = () => {
+      const input = legacy.createThreeSurfaceTextures({
+        width: 1,
+        height: 1,
+        color: new Uint8Array([100, 120, 140, 255]),
+        roughness: new Uint8Array([80]),
+        bump: new Uint8Array([128]),
+      });
+      input.map.format = 1035 as typeof input.map.format;
+      input.map.generateMipmaps = false;
+      return input;
+    };
+    const webgl1Renderer = {
+      isWebGLRenderer: true,
+      capabilities: { isWebGL2: false },
+      extensions: { has: (name: string) => name === "EXT_sRGB" },
+    };
+
+    const accepted = legacyTextures();
+    const material = legacy.createThreeTriplanarMaterial(accepted);
+    const shader = actualStandardShader();
+    expect(() => material.onBeforeCompile(shader as never, webgl1Renderer as never)).not.toThrow();
+    expect(() => material.onBeforeCompile(shader as never, webgl2Renderer as never)).toThrow(
+      /legacy sRGB texture uploads require WebGL1/,
+    );
+    material.dispose();
+    accepted.dispose();
+
+    const rough = legacyTextures();
+    rough.roughnessMap.format = 1035 as typeof rough.roughnessMap.format;
+    expect(() => legacy.createThreeTriplanarMaterial(rough)).toThrow(/RGBA8 2D texture/);
+    rough.dispose();
+  } finally {
+    vi.doUnmock("three");
+    vi.resetModules();
+  }
 });
