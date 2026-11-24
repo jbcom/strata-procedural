@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.2](https://github.com/jbcom/strata-procedural/compare/v0.2.1...v0.2.2) (2026-11-24)
+
+
+### Bug Fixes
+
+* **three:** detect the legacy sRGB format without reading a missing export ([6dc52fb](https://github.com/jbcom/strata-procedural/commit/6dc52fbea91db4e5b7273fafd8ffea04733a0f8e))
+* **three:** detect the legacy sRGB format without reading a missing export ([c8e7dd0](https://github.com/jbcom/strata-procedural/commit/c8e7dd03f411c5dbdb52c97d342a34eb0af585d4))
+
 ## [0.2.1](https://github.com/jbcom/strata-procedural/compare/v0.2.0...v0.2.1) (2026-10-17)
 
 
