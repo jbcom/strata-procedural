@@ -3,7 +3,7 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -97,6 +97,29 @@ function assertPureConsumerHasNoAdapters(destination) {
     stdio: "pipe",
   });
 }
+
+// A bundler resolves `Namespace.member` against the consumer's installed Three and
+// reports an undefined import when the member is gone. Feature-detect optional
+// members with `in` instead of reading them.
+async function assertBuiltThreeMemberReadsExist() {
+  const three = await import("three");
+  for (const file of readdirSync(path.join(packageRoot, "dist")).filter((name) =>
+    name.endsWith(".js"),
+  )) {
+    const source = readFileSync(path.join(packageRoot, "dist", file), "utf8");
+    for (const [, alias] of source.matchAll(/import\s*\*\s*as\s+(\w+)\s+from\s*["']three["']/g)) {
+      for (const [, member] of source.matchAll(new RegExp(`\\b${alias}\\.(\\w+)`, "g"))) {
+        assert(
+          member in three,
+          `dist/${file} reads ${alias}.${member}, which the installed three does not export`,
+        );
+      }
+    }
+  }
+  console.log("built adapters read only Three namespace members the installed peer exports");
+}
+
+await assertBuiltThreeMemberReadsExist();
 
 const firstPackDirectory = mkdtempSync(path.join(tmpdir(), "strata-procedural-pack-a-"));
 const secondPackDirectory = mkdtempSync(path.join(tmpdir(), "strata-procedural-pack-b-"));
