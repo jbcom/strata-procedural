@@ -81,11 +81,17 @@ function unit(value: number, name: string): number {
   return value;
 }
 
+// Three r152's `_SRGBAFormat` constant; later peers no longer export it.
+const LEGACY_SRGBA_FORMAT: number = 1035;
+
 // r152 WebGL1 uploads replace the color texture's format in place. Later
-// peers do not export this format; never accept its numeric value alone.
+// peers do not export `_SRGBAFormat`; never accept its numeric value alone.
+// Detect the export with `in` rather than a member read: a bundler resolves a
+// member read of a namespace import statically and reports an undefined import
+// against peers without the export, while computed access would keep the whole
+// Three namespace in every consumer bundle.
 function legacySrgb(value: Texture): boolean {
-  const format = (ThreePeer as unknown as { _SRGBAFormat?: number })._SRGBAFormat;
-  return typeof format === "number" && value.format === format;
+  return "_SRGBAFormat" in ThreePeer && value.format === LEGACY_SRGBA_FORMAT;
 }
 
 function texture(value: Texture, name: string, color: boolean): void {
