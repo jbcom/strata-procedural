@@ -11,13 +11,17 @@ consumers keep their dependency boundary explicit.
 | `strata-procedural` | Noise, SDF, terrain, surface samplers/layers/wear, mesh generators, UV/triplanar/atlas, shader, and scalar-relief APIs | none |
 | `strata-procedural/noise` | `seedToUint32`, `createSeededRandom`, `createSeededNoise`, `fractalNoise`, `createValueNoise2D`, `createFractalNoise2D`, `createSineLattice2D`, `createJitteredCellField2D` | none |
 | `strata-procedural/sdf` | `sdSphere`, `sdPlane`, `sdBox`, `opUnion`, `opIntersection`, `opSubtraction`, `opSmoothUnion`, `opSmoothSubtraction` | none |
-| `strata-procedural/terrain` | `createSeededTerrainField`, `composeScalarField2D`, `transformScalarField2D`, `createDirectionalField2D`, `createSmoothMask2D`, scalar-grid and signed-vector codecs, and terrain/field types | none |
+| `strata-procedural/terrain` | `createBiomeVariationField`, `createSeededTerrainField`, `composeScalarField2D`, `transformScalarField2D`, `createDirectionalField2D`, `createSmoothMask2D`, scalar-grid and signed-vector codecs, and terrain/field types | none |
 | `strata-procedural/materials` | Surface plans, samplers, composition, wear, UV diagnostics, triplanar sampling, atlas bakes, and `bakeTangentNormalMap` | none |
 | `strata-procedural/mesh` | `createRevolvedMesh`, `createRevolvedSurfaceMesh`, `createSweptMesh`, `createSheetMesh`, `createParametricSheetMesh`, `createCurveArcLengthTable`, `curveArcLengthAt`, `curveParameterAtArcLength`, `superellipsePoint2D`, `superellipseHalfDepth2D`, and mesh types | none |
 | `strata-procedural/shaders` | `seededSurfaceNoiseGlsl`, `segmentCoverageGlsl`, `scalarGrid16Glsl`, `signedVector8Glsl`, `replaceOrThrow`, `applyShaderPatches` | none |
 | `strata-procedural/surface-fields` | Scalar-profile, explicit differential, relief-frame, uniform-packing, and GLSL APIs | none |
 | `strata-procedural/three` | `createThreeHeightfieldGeometry`, `createThreeMeshGeometry`, `createThreeSurfaceTextures`, `snapshotThreeStaticMeshes`, `createThreeTriplanarMaterial` | `three` peer |
 | `strata-procedural/r3f` | `StrataHeightfield` and `StrataHeightfieldProps` | React, Three, and R3F peers |
+
+## Biome variation
+
+`createBiomeVariationField({ placementSeed, variationSeed, biomes })` snapshots a table of biome recipes. Each recipe requires a density in `[0, 1]` and weighted variant IDs. Weights are finite relative values, zero disables a variant, and at least one weight must be positive. A recipe may specify inclusive elevation limits, maximum slope, and positive scale limits per variant. Read a site with `{ id, biome, elevation, slope }`. Unknown biomes, unsuitable sites and empty positions return `null`. A selected site returns its variant ID, scale, rotation in radians and a normalized variation value. Repeated queries and changes to the order of queries produce the same result. Changing just the variation seed leaves occupancy intact.
 
 ## Seeded primitives
 

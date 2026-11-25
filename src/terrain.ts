@@ -1,3 +1,11 @@
+export { createBiomeVariationField } from "./biomeVariation.js";
+export type {
+  BiomeVariant,
+  BiomeVariationRule,
+  BiomeVariationSite,
+  BiomeVariation,
+  BiomeVariationOptions,
+} from "./biomeVariation.js";
 import { createSeededNoise, createSeededRandom, fractalNoise, type Seed } from "./noise.js";
 export { packSignedVector8, decodeSignedVector8 } from "./signedVector8.js";
 import { opSmoothSubtraction, type Vec3 } from "./sdf.js";
