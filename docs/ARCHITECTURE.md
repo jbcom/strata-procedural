@@ -1,5 +1,7 @@
 # Architecture
 
+Biome placement and variation use independent seed domains keyed by the caller's biome and persistent site ID. The terrain layer returns values and variant IDs. Asset loading, world progression and mapping those IDs to meshes or sounds belong to the consumer.
+
 ## Stochastic sampling boundary
 
 The renderer-neutral materials API owns seeded cell selection, paired sample

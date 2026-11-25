@@ -144,7 +144,19 @@ export type {
   ScalarGrid16Input,
   ScalarGrid16,
 } from "./terrain.js";
-export { createSeededTerrainField, packScalarGrid16, sampleScalarGrid16 } from "./terrain.js";
+export type {
+  BiomeVariant,
+  BiomeVariationRule,
+  BiomeVariationSite,
+  BiomeVariation,
+  BiomeVariationOptions,
+} from "./terrain.js";
+export {
+  createBiomeVariationField,
+  createSeededTerrainField,
+  packScalarGrid16,
+  sampleScalarGrid16,
+} from "./terrain.js";
 export { packSignedVector8, decodeSignedVector8 } from "./terrain.js";
 export { createValueNoise2D, createFractalNoise2D, createSineLattice2D } from "./noise.js";
 export { createJitteredCellField2D } from "./noise.js";

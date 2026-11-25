@@ -35,6 +35,9 @@
   `0` differs from string `'0'` here. Sine low bits may differ across engines/platforms.
 - New value-noise coordinates and sine-lattice integer coordinates must have absolute
   magnitude below `2**52`; finite products/phases can still lose phase resolution.
+- `terrain.createBiomeVariationField` evaluates named biome rules with density, elevation,
+  slope, variant weights and scale ranges. Use independent placement and variation seeds and
+  persistent site IDs. Variant IDs are resolved by the consumer.
 - `terrain.composeScalarField2D` captures up to 64 ordered add/multiply/blend layers.
   Add gain defaults to one; negative gains are allowed. Blend weights must be in
   `[0, 1]` and are not clamped; targets and weights are sampled even at endpoints.

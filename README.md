@@ -35,6 +35,10 @@ peer dependencies used only by the adapter subpaths. The Three texture adapter
 packs scalar maps into linear grayscale RGBA, including bump, for WebGL1
 compatibility at the Three r152 peer floor.
 
+## Author biome-specific variation
+
+Use `createBiomeVariationField` to choose which named sites are occupied and what each site contains. Biome recipes can set density, elevation and slope limits, weighted variants, and scale ranges. Supply one seed for placement and another for variation, so changing a save's population or decoration choices preserves the habitat layout. Variant IDs can refer to authored models, sounds, or procedural outputs owned by the caller.
+
 ## Start with a terrain field
 
 ```ts
