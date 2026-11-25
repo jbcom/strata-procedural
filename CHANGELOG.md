@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0](https://github.com/jbcom/strata-procedural/compare/v0.2.2...v0.3.0) (2026-11-25)
+
+
+### Features
+
+* **terrain:** add biome placement and variance recipes ([accebde](https://github.com/jbcom/strata-procedural/commit/accebde2a2b8b5e698fbe8b391f4fd8587689436))
+* **terrain:** add independent biome placement and variation recipes ([645f990](https://github.com/jbcom/strata-procedural/commit/645f990ecab1266380e3086979081a5e2fa32fef))
+
 ## [0.2.2](https://github.com/jbcom/strata-procedural/compare/v0.2.1...v0.2.2) (2026-11-24)
 
 
