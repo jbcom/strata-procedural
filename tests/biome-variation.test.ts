@@ -53,6 +53,42 @@ describe("biome variation recipes", () => {
     expect(field({ ...sites[0], biome: "marsh", elevation: 4 })?.id).toBe("reed");
   });
 
+  it("preserves occupancy with subnormal weights and excludes disabled variants", () => {
+    const site = { id: "bank", biome: "marsh", elevation: 0, slope: 0 } as const;
+    for (let variationSeed = 0; variationSeed < 32; variationSeed++) {
+      const field = createBiomeVariationField({
+        placementSeed: 9,
+        variationSeed,
+        biomes: {
+          marsh: {
+            density: 1,
+            variants: [
+              { id: "rock", weight: 0 },
+              { id: "reed", weight: Number.MIN_VALUE },
+              { id: "sedge", weight: 0 },
+            ],
+          },
+        },
+      });
+      expect(field(site)?.id).toBe("reed");
+    }
+  });
+
+  it("keeps relative weights when an unscaled sum would overflow", () => {
+    const variants = (weight: number) => [
+      { id: "reed", weight },
+      { id: "sedge", weight },
+    ];
+    const field = (weight: number) =>
+      createBiomeVariationField({
+        placementSeed: 9,
+        variationSeed: 21,
+        biomes: { marsh: { density: 1, variants: variants(weight) } },
+      });
+    const marshSites = sites.map((site) => ({ ...site, biome: "marsh" as const }));
+    expect(marshSites.map(field(Number.MAX_VALUE))).toEqual(marshSites.map(field(1)));
+  });
+
   it("rejects ambiguous and invalid recipes", () => {
     const resolve = (weights: number[]) =>
       createBiomeVariationField({

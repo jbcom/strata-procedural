@@ -21,7 +21,7 @@ consumers keep their dependency boundary explicit.
 
 ## Biome variation
 
-`createBiomeVariationField({ placementSeed, variationSeed, biomes })` snapshots a table of biome recipes. Each recipe requires a density in `[0, 1]` and weighted variant IDs, and may specify inclusive elevation limits, maximum slope, and positive scale limits per variant. Read a site with `{ id, biome, elevation, slope }`. Unknown biomes, unsuitable sites and empty positions return `null`. A selected site returns its variant ID, scale, rotation in radians and a normalized variation value. Repeated queries and changes to the order of queries produce the same result. Changing just the variation seed leaves occupancy intact.
+`createBiomeVariationField({ placementSeed, variationSeed, biomes })` snapshots a table of biome recipes. Each recipe requires a density in `[0, 1]` and weighted variant IDs. Weights are finite relative values, zero disables a variant, and at least one weight must be positive. A recipe may specify inclusive elevation limits, maximum slope, and positive scale limits per variant. Read a site with `{ id, biome, elevation, slope }`. Unknown biomes, unsuitable sites and empty positions return `null`. A selected site returns its variant ID, scale, rotation in radians and a normalized variation value. Repeated queries and changes to the order of queries produce the same result. Changing just the variation seed leaves occupancy intact.
 
 ## Seeded primitives
 

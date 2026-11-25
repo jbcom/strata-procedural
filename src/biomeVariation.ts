@@ -2,6 +2,7 @@ import { createSeededRandom, seedToUint32, type Seed } from "./noise.js";
 
 export interface BiomeVariant<Id extends string = string> {
   id: Id;
+  /** Relative weight. Zero disables the variant. */
   weight: number;
   scale?: readonly [min: number, max: number];
 }
@@ -46,7 +47,15 @@ export function createBiomeVariationField<Biome extends string, Id extends strin
 ): (site: BiomeVariationSite<Biome>) => BiomeVariation<Id> | null {
   const placementSeed = seedToUint32(options.placementSeed);
   const variationSeed = seedToUint32(options.variationSeed);
-  const rules = new Map<string, BiomeVariationRule<Id> & { total: number }>();
+  type WeightedVariant = BiomeVariant<Id> & { upperBound: number };
+  const rules = new Map<
+    string,
+    Omit<BiomeVariationRule<Id>, "variants"> & {
+      variants: WeightedVariant[];
+      fallback: WeightedVariant;
+      total: number;
+    }
+  >();
   for (const biome of Object.keys(options.biomes) as Biome[]) {
     const rule = options.biomes[biome];
     if (!rule) continue;
@@ -72,13 +81,24 @@ export function createBiomeVariationField<Biome extends string, Id extends strin
       seen.add(variant.id);
       return { ...variant, scale: variant.scale && ([...variant.scale] as [number, number]) };
     });
-    const total = variants.reduce((sum, variant) => sum + variant.weight, 0);
-    if (!Number.isFinite(total) || total <= 0)
+    const largest = variants.reduce((max, variant) => Math.max(max, variant.weight), 0);
+    let total = 0;
+    const weighted: WeightedVariant[] = [];
+    for (const variant of variants) {
+      if (variant.weight === 0) continue;
+      const upperBound = total + variant.weight / largest;
+      if (upperBound === total) continue;
+      weighted.push({ ...variant, upperBound });
+      total = upperBound;
+    }
+    const fallback = weighted.at(-1);
+    if (!fallback)
       throw new RangeError(`Biome "${biome}" requires a positive total variant weight`);
     rules.set(biome, {
       ...rule,
       elevation: rule.elevation && [...rule.elevation],
-      variants,
+      variants: weighted,
+      fallback,
       total,
     });
   }
@@ -101,18 +121,14 @@ export function createBiomeVariationField<Biome extends string, Id extends strin
     if (placement() >= rule.density) return null;
 
     const appearance = createSeededRandom(`${variationSeed}:variation:${key}`);
-    let remaining = appearance() * rule.total;
-    for (const variant of rule.variants) {
-      remaining -= variant.weight;
-      if (remaining >= 0) continue;
-      const [min, max] = variant.scale ?? [1, 1];
-      return {
-        id: variant.id,
-        scale: min + (max - min) * appearance(),
-        rotation: appearance() * Math.PI * 2,
-        variation: appearance(),
-      };
-    }
-    return null;
+    const draw = appearance() * rule.total;
+    const variant = rule.variants.find(({ upperBound }) => draw < upperBound) ?? rule.fallback;
+    const [min, max] = variant.scale ?? [1, 1];
+    return {
+      id: variant.id,
+      scale: min + (max - min) * appearance(),
+      rotation: appearance() * Math.PI * 2,
+      variation: appearance(),
+    };
   };
 }
